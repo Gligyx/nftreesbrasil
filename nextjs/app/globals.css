@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-one: #222222;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-one: #DDDDDD;
+  }
+}
+
+body {
+  background-color: darkgreen;
+}

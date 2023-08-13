@@ -1,0 +1,7 @@
+CREATE TABLE users (
+    eth_address VARCHAR(32) PRIMARY KEY,
+    username VARCHAR(64) UNIQUE,
+    nonce BIGINT NOT NULL,
+);
+
+INSERT INTO users (nonce, ...) VALUES (EXTRACT(EPOCH FROM NOW())::BIGINT + 1000000 + RANDOM()::BIGINT % 1000000, ...);

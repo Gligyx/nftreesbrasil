@@ -1,0 +1,33 @@
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 70px;
+  width: 100vw;
+  background-color: #331133;
+}
+
+#navUl {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+}
+
+.navElement {
+  margin-right: 16px;
+  margin-left: 16px;
+  background-color: #222222;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  text-decoration: none; /* Remove underline for the Link component */
+}
+
+.navElement:hover {
+  background-color: #444;
+}

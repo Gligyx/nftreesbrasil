@@ -1,0 +1,23 @@
+#loginScreen {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loginButton {
+  background-color: #222222;
+  /*height: 80px;*/
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+#loginButton:hover {
+  background-color: #444;
+}

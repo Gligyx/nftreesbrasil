@@ -3,11 +3,12 @@
 CREATE TABLE users (
     eth_address VARCHAR(42) PRIMARY KEY,
     username VARCHAR(64) UNIQUE,
+    role text CHECK (role IN ('User', 'ProjectOwner', 'Validator')),
     nonce BIGINT NOT NULL
 );
 
 -- This is how you insert a new user, without a username
-INSERT INTO users (nonce, eth_address) VALUES (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM()::BIGINT % 1000000), '0x123');
+INSERT INTO users (nonce, eth_address, role) VALUES (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM()::BIGINT % 1000000), '0x123', 'User');
 
 -- We can set the username later
 UPDATE users SET username = 'alice' WHERE eth_address = '0x123';

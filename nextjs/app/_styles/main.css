@@ -1,0 +1,30 @@
+/* General styling of <main> */
+
+main {
+  position: absolute;
+  top: 70px;
+  margin: 24px;
+  width: 100vw;
+  height: calc(100vh - 70px - 0px);
+  font-color: #222222;
+}
+
+h1 {
+  font-size: 48px;
+}
+
+h2 {
+  fonz-size: 42px;
+}
+
+h3 {
+  fonz-size: 36px;
+}
+
+h4 {
+  fonz-size: 28px;
+}
+
+p {
+  font-size: 24px;
+}

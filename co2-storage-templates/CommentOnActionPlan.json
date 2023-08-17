@@ -1,0 +1,26 @@
+{ 
+  "project_id": {
+    "type": "string",
+    "mandatory": true
+  }, 
+  "action_plan_id": {
+    "type": "string",
+    "mandatory": true
+  }, 
+  "action_plan_cid": {
+    "type": "cid",
+    "mandatory": true
+  },
+  "comment_id": {
+    "type": "string",
+    "mandatory": true
+  }, 
+  "comment": {
+    "type": "text",
+    "mandatory": true
+  }, 
+  "evaluator_signature": {
+    "type": "string",
+    "mandatory": true
+  }
+}

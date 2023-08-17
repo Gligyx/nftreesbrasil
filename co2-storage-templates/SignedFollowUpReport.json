@@ -1,0 +1,30 @@
+{
+  "project_id": {
+    "type": "string",
+    "mandatory": true
+  },
+  "action_plan_id": {
+    "type": "string",
+    "mandatory": true
+  },
+  "signed_follow_up_report_id": {
+    "type": "string",
+    "mandatory": true
+  },
+  "follow_up_report_object": {
+    "type": "cid",
+    "mandatory":.true
+  },
+  "timestamp": {
+    "type"_ "datetime",
+    "mandatory": true
+  },
+  "project_owner_signature": {
+    "type": "string",
+    "mandatory": true
+  },
+  "validator_signature_list": {
+    "type": "json",
+    "mandatory": true
+  },
+}

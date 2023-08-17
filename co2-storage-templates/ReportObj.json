@@ -1,0 +1,14 @@
+{
+  "description": {
+    "type": "string",
+    "mandatory": true
+  },
+  "documents": {
+    "type": "documents",
+    "mandatory": false
+  },
+  "images": {
+    "type": "images",
+    "mandatory": false
+  } 
+ }

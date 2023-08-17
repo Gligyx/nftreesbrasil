@@ -1,0 +1,42 @@
+{
+  "project_id": {
+    "type": "string",
+    "mandatory": true
+  },
+  "action_plan_id": {
+    "type": "string",
+    "mandatory": true
+  },
+  "nonce": {
+    "type": "int",
+    "mandatory": true
+  },
+  "ancestor": {
+    "type": "string",
+    "mandatory": false
+  },
+  "project_name": {
+    "type": "string",
+    "mandatory": true
+  },
+  "description": {
+    "type": "text",
+    "mandatory": false
+  },
+  "documents": {
+    "type": "documents",
+    "mandatory": false
+  },
+  "images": {
+    "type": "images",
+    "mandatory": false
+  },
+  "timestamp": {
+    "type": "datetime",
+    "mandatory": true
+  },
+  "project_owner_signature": {
+    "type": "string",
+    "mandatory": true
+  }
+}

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useContext } from "react";
 import { AuthContext } from "@/app/_sharedComponents/AuthProvider";
 import LoginScreen from "@/app/_sharedComponents/LoginScreen";
+import { toast } from 'react-toastify';
 import "@/app/_styles/main.css";
 
 
@@ -22,7 +23,7 @@ export default function ProfilePage() {
   async function submit() {
 
   }
-
+toast.info("Hello World!")
 
   return (
     <>    

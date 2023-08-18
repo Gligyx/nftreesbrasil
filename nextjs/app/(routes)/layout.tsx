@@ -1,9 +1,12 @@
 'use client'
 import AuthProvider from "../_sharedComponents/AuthProvider";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ChildrenProps {
   children: React.ReactNode
 }
+
 
 /**
  * This component provides AuthProvider, and it contains the <html> and <body> tags
@@ -15,6 +18,8 @@ export default function LayoutWithAuthProvider({ children }: ChildrenProps) {
   return (
     <html lang="en">
       <body>
+        <ToastContainer />
+
         <AuthProvider>
           {children}
         </AuthProvider>

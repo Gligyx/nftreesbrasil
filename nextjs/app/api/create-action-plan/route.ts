@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
 
   // Will copy-paste elements here to the actual workflow
   const long = async () => {
-    writer.write(encoder.encode("data: " + "message" + "\n\n"));
+    writer.write(encoder.encode("data: " + JSON.stringify({message: "Custom message."}) + "\n\n"));
     writer.write(encoder.encode("data: " + JSON.stringify({fieldA: "32", fieldB: "42"}) + "\n\n"));
-    writer.write(encoder.encode("data: " + "error message" + "\n\n"));
+    writer.write(encoder.encode("data: " + JSON.stringify({error: "Error message (200)"}) + "\n\n"));
     writer.close();
     closed = true;
     console.log("close")

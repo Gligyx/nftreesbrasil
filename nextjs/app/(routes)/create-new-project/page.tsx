@@ -10,6 +10,7 @@ import { projectConfig } from '@/config';
 
 export default function ProfilePage() {
   const { isAuthenticated } = useContext(AuthContext);
+  const toastId = React.useRef<Id | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const documentsRef = useRef(null);
@@ -32,13 +33,12 @@ export default function ProfilePage() {
       console.error("No description is specified!");
       return;
     }
-
+    startActionPlanCreation();
   }
 
 
 async function startActionPlanCreation() {
   // Start SSE connection (Server Sent Events)
-  const toastId = React.useRef<Id | null>(null);
   const eventSource = new EventSource(`${projectConfig.serverAddress}/api/create-action-plan`);
 
   
@@ -51,7 +51,7 @@ async function startActionPlanCreation() {
   // Handle all non-error messages
   eventSource.onmessage = (event) => {
     const message = JSON.parse(event.data);
-
+console.log("The Message: ", message)
     if (message.something === 'a') {
       console.log('a');
       // probably do transfer start, or something

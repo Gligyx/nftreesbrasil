@@ -6,6 +6,7 @@ import LoginScreen from "@/app/_sharedComponents/LoginScreen";
 import { startActionPlanCreation } from '@/app/_lib/actionPlanCreation';
 import { Id, toast } from 'react-toastify';
 import "@/app/_styles/main.css";
+import { getAddress } from '@/app/_lib/user-tools';
 
 
 export default function ProfilePage() {
@@ -33,11 +34,16 @@ export default function ProfilePage() {
       console.error("No description is specified!");
       return;
     }
+
+    const address = await getAddress();
+    if (address === -1) toast.error("Could not connect to MetaMask!");
+
     startActionPlanCreation(toastId, {
       title,
       description,
       documentsRef,
-      imagesRef
+      imagesRef,
+      projectOwner: address as EthAddress
     });
   }
 

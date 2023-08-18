@@ -1,6 +1,7 @@
 import { projectConfig } from "@/config"
 import React from "react";
 import { Id, toast } from "react-toastify";
+import { getAddress } from "./user-tools";
 
 // move function here
 export async function startActionPlanCreation(toastId: ToastId, uploadObj: ActionPlanUploadObj) {
@@ -14,9 +15,10 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
   });
   
   // Handle all non-error messages
-  eventSource.onmessage = (event) => {
+  eventSource.onmessage = async (event) => {
     const message = JSON.parse(event.data);
     console.log("The Message: ", message);
+    
 
     // Server asked for data (name, desc, and optional files)
     if (message.startFileUpload) {
@@ -26,7 +28,8 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
         documentsRef: uploadObj.documentsRef,
         imagesRef: uploadObj.imagesRef,
         documentName: message.documentName,
-        imageName: message.imageName
+        imageName: message.imageName,
+        projectOwner: uploadObj.projectOwner as EthAddress
       });
 
       toast.update(toastId.current as Id, {
@@ -69,6 +72,7 @@ async function uploadData(uploadObj: ActionPlanUploadObjReady) {
     const formData = new FormData();
     formData.append('title', uploadObj.title);
     formData.append('description', uploadObj.description);
+    formData.append('owner', uploadObj.projectOwner);
     
     if (uploadObj.documentsRef?.current?.files?.length === 0) formData.append('documentName', uploadObj.documentName);    // If no file, upload placeholder name
     else if (uploadObj.documentsRef && uploadObj.documentsRef.current && uploadObj.documentsRef.current.files)

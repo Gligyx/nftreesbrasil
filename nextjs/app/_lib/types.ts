@@ -24,7 +24,8 @@ interface ActionPlanUploadObj {
   title: string, 
   description: string, 
   documentsRef: Documents, 
-  imagesRef: Images
+  imagesRef: Images,
+  projectOwner: EthAddress
 }
 interface ActionPlanUploadObjReady {
   title: string, 
@@ -32,7 +33,8 @@ interface ActionPlanUploadObjReady {
   documentsRef: Documents, 
   imagesRef: Images, 
   documentName: string, 
-  imageName: string
+  imageName: string,
+  projectOwner: EthAddress
 }
 
 type ToastId = React.MutableRefObject<string | number | null>;

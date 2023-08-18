@@ -11,8 +11,8 @@ import "@/app/_styles/main.css";
 export default function ProfilePage() {
   const { isAuthenticated } = useContext(AuthContext);
   const toastId = React.useRef<Id | null>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const documentsRef = useRef(null);
   const imagesRef = useRef(null);
 
@@ -33,7 +33,12 @@ export default function ProfilePage() {
       console.error("No description is specified!");
       return;
     }
-    startActionPlanCreation(toastId);
+    startActionPlanCreation(toastId, {
+      title,
+      description,
+      documentsRef,
+      imagesRef
+    });
   }
 
 
@@ -42,7 +47,6 @@ export default function ProfilePage() {
     <>    
     {isAuthenticated?
       <div>
-        Export as many components as possible, don't work here!
 
         <div>
           <p>{"Name of the Project: "}</p>

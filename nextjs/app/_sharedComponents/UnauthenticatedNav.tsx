@@ -7,8 +7,7 @@ export default function UnauthenticatedNav() {
   return (
     <nav>
       <ul id="navUl">
-        <Link href={'/experimental-area'} className="navElement">First Experiment</Link>
-        <Link href={'/experimental-area-2'} className="navElement">Second Experiment</Link>
+        <Link href={'/create-new-project'}   className="navElement">Create New Project</Link>
         <Link href={'/profile'} className="navElement">Profile</Link>
       </ul>
     </nav>

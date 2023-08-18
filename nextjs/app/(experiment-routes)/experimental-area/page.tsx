@@ -1,8 +1,8 @@
 'use client'
 import { useContext } from "react";
-import LoginScreen from "../../_sharedComponents/LoginScreen";
-import { AuthContext } from "../../_sharedComponents/AuthProvider";
-import AuthenticatedNav from "../../_sharedComponents/AuthenticatedNav";
+import LoginScreen from "@/app/_sharedComponents/LoginScreen";
+import { AuthContext } from "@/app/_sharedComponents/AuthProvider";
+import AuthenticatedNav from "@/app/_sharedComponents/AuthenticatedNav";
 import styles from "./experimental-area.module.css";
 
 

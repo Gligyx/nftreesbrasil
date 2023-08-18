@@ -1,5 +1,8 @@
 'use client'
-import AuthProvider from "../../_sharedComponents/AuthProvider";
+import { useContext } from "react";
+import { AuthContext } from "../../_sharedComponents/AuthProvider";
+import AuthenticatedNav from "@/app/_sharedComponents/AuthenticatedNav";
+import UnauthenticatedNav from "@/app/_sharedComponents/UnauthenticatedNav";
 
 interface ChildrenProps {
   children: React.ReactNode
@@ -7,13 +10,22 @@ interface ChildrenProps {
 
 
 export default function LayoutWithAuthProvider({ children }: ChildrenProps) {
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+
   return (
-    <html lang="en">
-      <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </body>
-    </html>
+    <>
+    <header>
+      {isAuthenticated? 
+        <AuthenticatedNav />
+      : 
+        <UnauthenticatedNav />
+      }
+    </header>
+
+    <main>
+      {children}
+    </main>
+        
+    </>
   )
 }

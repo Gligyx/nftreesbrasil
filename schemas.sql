@@ -19,7 +19,7 @@ UPDATE users SET nonce = (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM(
 
 
 -- Tables that are related to CO2.Storage
--- (Transfer.Storage)
+-- (Transfer.Storage) :
 
 -- This is the table that lists projects, this is not directly related to a CO2.Storage template
 -- This connects all the other tables, that's the idea

@@ -1,7 +1,5 @@
 import { projectConfig } from "@/config";
-import { Signer } from "ethers";
-import conn from './db';
-import { ethers } from "ethers";
+import { Signer, ethers  } from "ethers";
 
 interface Window {
   ethereum?: any;

@@ -15,3 +15,6 @@ interface jwtObj {
 }
 
 type Username = string;
+
+type Documents = React.MutableRefObject<HTMLInputElement | null>;
+type Images = React.MutableRefObject<HTMLInputElement | null>;

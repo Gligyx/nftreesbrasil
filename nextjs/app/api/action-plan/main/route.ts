@@ -49,12 +49,10 @@ async function executeActionPlanWorkflow(writer: WritableStreamDefaultWriter<any
     const cacheFolder = process.env.CACHE_FOLDER;
     let closed = false;
 
-    // Get data from front end (title, desc, possible documents and possible images)
-    const [projectObject, documentsArray, imagesArray] = await getData(writer, encoder, cacheFolder);
-    const assetToHash = await prepareAsset(projectObject, documentsArray, imagesArray);
-    
-    const signableObject: SignableActionPlan = await createSignableObject(assetToHash) as SignableActionPlan;
-    console.log("Signable Object: ", signableObject)
+    const [projectObject, documentsArray, imagesArray] = await getData(writer, encoder, cacheFolder);           // Get data from front end (title, desc, possible documents and possible images)
+    const assetToHash = await prepareAsset(projectObject, documentsArray, imagesArray);                         // Prepare asset for hashing
+    const signableObject: SignableActionPlan = await createSignableObject(assetToHash) as SignableActionPlan;   // You can already run JSON.stringify on this
+console.log("Signable Object: ", signableObject)
     
     // Ask user to sign
     writer.write(encoder.encode("data: " + JSON.stringify({
@@ -68,7 +66,7 @@ async function executeActionPlanWorkflow(writer: WritableStreamDefaultWriter<any
     const rawSignature = fs.readFileSync(`${cacheFolder}/${projectObject.projectId}.done`, { encoding: 'utf8', flag: 'r' });
     const signature = JSON.parse(rawSignature).signature;
 
-    const asset: ActionPlan = {
+    const asset: ActionPlan = {                                                                                 // Signed, ready asset
       ... assetToHash,
       action_plan_id: createActionPlanId(signableObject),
       project_owner_signature: signature

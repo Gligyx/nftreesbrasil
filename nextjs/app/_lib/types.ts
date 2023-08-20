@@ -52,6 +52,7 @@ interface InitProjectObject {
 
 // CO2.Storage asset IDs
 type ProjectId = string;                  // 20 character long string, example: Project-0123456789ab
+type ActionPlanId = string;               // 23 character long string, example: ActionPlan-0123456789ab
 
 
 // Object for hashing
@@ -63,4 +64,17 @@ interface GeneralObject {
 interface FileEntry {
   name: string,
   content: ReadableStream
+}
+
+
+// Signable objects
+interface SignableActionPlan {
+  project_id: ProjectId,
+  nonce: number,
+  ancestor: ActionPlanId | null,
+  project_name: string,
+  description: string,
+  documents: [],
+  images: [],
+  timestamp: number,
 }

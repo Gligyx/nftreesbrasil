@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   
     // Process Document(s) (currently we can only take 1 document)
     if (!documents) {
-      fs.writeFileSync(cacheFolder + formData.get('documentName') + ".done", JSON.stringify(projectObject));    // We signal to create-action-plan that we are done
+      fs.writeFileSync(cacheFolder + formData.get('documentName') + ".done", JSON.stringify(projectObject));    // We signal to main that we are done
       console.log("There are no documents attached for this ActionPlan.");
     } else {
       uploadFile(documents, projectObject);
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Process Image(s) (currently we can only take 1 image)
     if (!images) {
-      fs.writeFileSync(cacheFolder + formData.get('imageName') + ".done", Date.now().toString());       // We signal to create-action-plan that we are done
+      fs.writeFileSync(cacheFolder + formData.get('imageName') + ".done", Date.now().toString());       // We signal to main that we are done
       console.log("There are no images attached for this ActionPlan");
     } else {
       uploadFile(images, projectObject);
@@ -77,6 +77,6 @@ async function uploadFile(formElement: FormDataEntryValue, projectObject: InitPr
   const buffer = await file.arrayBuffer();
   
   fs.writeFile(filePath, new DataView(buffer), () => {
-    fs.writeFileSync(process.env.CACHE_FOLDER + file.name + ".done", JSON.stringify(projectObject));             // We signal to create-action-plan that we are done
+    fs.writeFileSync(process.env.CACHE_FOLDER + file.name + ".done", JSON.stringify(projectObject));             // We signal to main that we are done
   });
 }

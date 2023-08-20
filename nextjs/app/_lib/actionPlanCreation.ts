@@ -2,14 +2,15 @@ import { projectConfig } from "@/config"
 import React from "react";
 import { Id, toast } from "react-toastify";
 import { getAddress } from "./user-tools";
+import { signMessage } from "./signature-tools-client";
 
 // move function here
 export async function startActionPlanCreation(toastId: ToastId, uploadObj: ActionPlanUploadObj) {
   // Start SSE connection (Server Sent Events)
-  const eventSource = new EventSource(`${projectConfig.serverAddress}/api/create-action-plan`);
+  const eventSource = new EventSource(`${projectConfig.serverAddress}/api/action-plan/main`);
 
   // Notify the user that the process has started
-  toastId.current = toast("Creating new ActionPlan...", {
+  toastId.current = toast.info("Creating new ActionPlan...", {
     autoClose: false,
     closeButton: false
   });
@@ -37,6 +38,35 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
         type: toast.TYPE.INFO,
         autoClose: false
       });
+    }
+
+    if (message.status === "preparing_asset") {
+      toast.update(toastId.current as Id, {
+        render: "Preparing asset...",
+        type: toast.TYPE.INFO,
+        autoClose: false
+      });
+    }
+
+    if (message.sendSignature) {
+      toast.update(toastId.current as Id, {
+        render: "Please sign the ActionPlan asset!",
+        type: toast.TYPE.INFO,
+        autoClose: false
+      });
+
+      const signedMessage = await signMessage(message.message);
+
+      if (!signedMessage) {
+        toast.update(toastId.current as Id, {
+          render: "Error when generating signature. Please try again!",
+          type: toast.TYPE.ERROR,
+          autoClose: 5000
+        })
+        return;
+      }
+      
+      sendSignature(signedMessage, message.projectId);
     }
     
     
@@ -66,7 +96,7 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
 async function uploadData(uploadObj: ActionPlanUploadObjReady) {
   console.log("Data upload is starting...");
   try {
-    const url = `${projectConfig.serverAddress}/api/action-plan-data-upload`;
+    const url = `${projectConfig.serverAddress}/api/action-plan/data-upload`;
   
     // These elements will be always added
     const formData = new FormData();
@@ -95,5 +125,28 @@ async function uploadData(uploadObj: ActionPlanUploadObjReady) {
     
   } catch (error) {
     console.error("There was an error while creating new ActionPlan: ", error);
+  }
+}
+
+async function sendSignature(signedMessage: string, projectId: ProjectId) {
+  try {
+    const url = `${projectConfig.serverAddress}/api/action-plan/send-signature`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        signature: signedMessage,
+        projectId: projectId
+      })
+    });
+
+    if (response.ok) console.log("Signature sent!");
+    else throw "There was an error while sending signature";
+
+  } catch (error) {
+    console.error("There was an error while tring to send signed ActionPlan to server: ", error);
   }
 }

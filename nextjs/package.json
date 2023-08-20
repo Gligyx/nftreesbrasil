@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@co2-storage/js-api": "^1.4.0",
     "@types/node": "20.4.10",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
@@ -22,7 +23,9 @@
     "headlessui": "^0.0.0",
     "heroicons": "^2.0.18",
     "jsonwebtoken": "^9.0.1",
+    "native-fetch": "^4.0.2",
     "next": "13.4.13",
+    "node-fetch": "^2.6.7",
     "pg": "^8.11.2",
     "postcss": "8.4.27",
     "react": "18.2.0",

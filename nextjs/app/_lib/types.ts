@@ -38,3 +38,15 @@ interface ActionPlanUploadObjReady {
 }
 
 type ToastId = React.MutableRefObject<string | number | null>;
+
+interface InitProjectObject {
+  title: string,
+  description: string,
+  address: EthAddress,
+  timestamp: number,
+  documentCount: number,
+  imageCount: number
+}
+
+// CO2.Storage asset IDs
+type ProjectId = string;                  // 20 character long string, example: Project-0123456789ab

@@ -68,16 +68,18 @@ async function uploadData(uploadObj: ActionPlanUploadObjReady) {
   try {
     const url = `${projectConfig.serverAddress}/api/action-plan-data-upload`;
   
-    // Add all the elements to a newly created form
+    // These elements will be always added
     const formData = new FormData();
     formData.append('title', uploadObj.title);
     formData.append('description', uploadObj.description);
     formData.append('owner', uploadObj.projectOwner);
     
+    // documentName is a placeholder, in case there is no document, so the signaling process can go on
     if (uploadObj.documentsRef?.current?.files?.length === 0) formData.append('documentName', uploadObj.documentName);    // If no file, upload placeholder name
     else if (uploadObj.documentsRef && uploadObj.documentsRef.current && uploadObj.documentsRef.current.files)
       formData.append('documents', uploadObj.documentsRef.current.files[0], uploadObj.documentName);                      // else upload file
-     
+    
+    // imageName is a placeholder, in case there is no document, so the signaling process can go on
     if (uploadObj.imagesRef?.current?.files?.length === 0) formData.append('imageName', uploadObj.imageName);             // If no file, upload placeholder name
     else if (uploadObj.imagesRef && uploadObj.imagesRef.current && uploadObj.imagesRef.current.files)
       formData.append('images', uploadObj.imagesRef.current.files[0], uploadObj.imageName);                               // else upload file
@@ -87,8 +89,9 @@ async function uploadData(uploadObj: ActionPlanUploadObjReady) {
       body: formData
     });
 
-    if (response.ok) console.log("File upload OK.");
-    else throw "There was an error while uploading file"
+    // Will not wait for actual file upload, the API route will exit early
+    if (response.ok) console.log("File upload started.");
+    else throw "There was an error while uploading data"
     
   } catch (error) {
     console.error("There was an error while creating new ActionPlan: ", error);

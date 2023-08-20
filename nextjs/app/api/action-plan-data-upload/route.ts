@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic' 
 import { NextRequest, NextResponse } from "next/server";
-const { createHash } = require('crypto')
+const { createHash } = require('crypto');
 import fs from 'fs';
 import conn from "@/app/_lib/db";
+import { createProjectId } from "@/app/_lib/actionPlanTools";
 
 
 export async function POST(request: NextRequest) {
@@ -9,7 +11,8 @@ export async function POST(request: NextRequest) {
     if (!conn) throw "Couldn't connect to database";                  // Check if database connection object exists
 
     const formData = await request.formData();
-    const cacheFolder = "./cache/";
+    if (!process.env.CACHE_FOLDER) throw "No cache folder specified! Check .env!";
+    const cacheFolder = process.env.CACHE_FOLDER;
     console.log(formData);
   
     const title = formData.get('title') as string;                    // Mandatory
@@ -18,7 +21,7 @@ export async function POST(request: NextRequest) {
     const documents = formData.get('documents');                      // Might or might not exist
     const images = formData.get('images');                            // Might or might not exist
 
-    const projectObject = {                                           // Information that will be saved to Document-[timestamp].done
+    const projectObject: InitProjectObject = {                        // Information that will be saved to Document-[timestamp].done
       title,
       description,
       address,
@@ -30,14 +33,7 @@ export async function POST(request: NextRequest) {
       fs.writeFileSync(cacheFolder + formData.get('documentName') + ".done", JSON.stringify(projectObject));    // We signal to create-action-plan that we are done
       console.log("There are no documents attached for this ActionPlan.");
     } else {
-      const documentFile: File = documents as File;
-      const filePath = `${cacheFolder}${documentFile.name}`;
-      const buffer = await documentFile.arrayBuffer();
-      
-      fs.writeFile(filePath, new DataView(buffer), () => {
-        fs.writeFileSync(cacheFolder + documentFile.name + ".done", JSON.stringify(projectObject));             // We signal to create-action-plan that we are done
-        console.log('Document upload done.');
-      })
+      uploadFile(documents, projectObject);
     }
 
     // Process Image(s) (currently we can only take 1 image)
@@ -45,22 +41,11 @@ export async function POST(request: NextRequest) {
       fs.writeFileSync(cacheFolder + formData.get('imageName') + ".done", Date.now().toString());       // We signal to create-action-plan that we are done
       console.log("There are no images attached for this ActionPlan");
     } else {
-      const imageFile: File = images as File;
-      const filePath = `${cacheFolder}${imageFile.name}`;
-      const buffer = await imageFile.arrayBuffer();
-      
-      const writeStream = fs.createWriteStream(filePath);
-
-      fs.writeFile(filePath, new DataView(buffer), () => {
-        fs.writeFileSync(cacheFolder + imageFile.name + ".done", Date.now().toString());                // We signal to create-action-plan that we are done
-        console.log("Image upload done.");
-      });
+      uploadFile(images, projectObject);
     }
 
     // Create ProjectId
-    const sha256Hex: string = createHash('sha256').update(JSON.stringify(projectObject)).digest('hex');
-    console.log("sha256Hex: ", sha256Hex);
-    const projectId = sha256Hex.slice(sha256Hex.length-12, sha256Hex.length);
+    const projectId: ProjectId = createProjectId(projectObject);
     console.log("ProjectId: ", `Project-${projectId}`);
 
     // Create database entry
@@ -82,4 +67,14 @@ export async function POST(request: NextRequest) {
       status: 500
     })
   }
+}
+
+async function uploadFile(formElement: FormDataEntryValue, projectObject: InitProjectObject) {
+  const file: File = formElement as File;
+  const filePath = `${process.env.CACHE_FOLDER}${file.name}`;
+  const buffer = await file.arrayBuffer();
+  
+  fs.writeFile(filePath, new DataView(buffer), () => {
+    fs.writeFileSync(process.env.CACHE_FOLDER + file.name + ".done", JSON.stringify(projectObject));             // We signal to create-action-plan that we are done
+  });
 }

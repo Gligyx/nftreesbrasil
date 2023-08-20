@@ -1,3 +1,5 @@
+// needs to be moved
+
 type EthAddress = string;
 type MaybeEthAddress = string | string[] | undefined | null;
 
@@ -50,3 +52,15 @@ interface InitProjectObject {
 
 // CO2.Storage asset IDs
 type ProjectId = string;                  // 20 character long string, example: Project-0123456789ab
+
+
+// Object for hashing
+interface GeneralObject {
+  [key: string]: any;
+}
+
+// FileEntry for CO2.Storage asset
+interface FileEntry {
+  name: string,
+  content: ReadableStream
+}

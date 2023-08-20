@@ -25,7 +25,9 @@ export async function POST(request: NextRequest) {
       title,
       description,
       address,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      documentCount: documents? 1 : 0,                                // We can't upload multiple files yet
+      imageCount: images? 1 :0
     }
   
     // Process Document(s) (currently we can only take 1 document)

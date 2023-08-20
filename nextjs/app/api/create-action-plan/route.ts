@@ -7,6 +7,7 @@ import conn from "@/app/_lib/db";
 const { createHash } = require('crypto');
 import { chainName, fgStorage } from "@/app/_lib/co2Conn";
 import { createProjectId } from "@/app/_lib/actionPlanTools";
+import { createSignableObject } from "@/app/_lib/signature-tools-server";
 
 
 export async function GET(request: NextRequest) {
@@ -37,24 +38,21 @@ export async function GET(request: NextRequest) {
     // Get the metadata file. It's in the file that signals that the file upload is done (or that there were no files attached)
     const rawText = fs.readFileSync(`${cacheFolder}/${documentName}.done`, { encoding: 'utf8', flag: 'r' });
     const projectObject = JSON.parse(rawText);
-    console.log("Metadata: ", projectObject);
-    console.log("Document file: ", documentName);
-    console.log("Image file: ", imageName);
-
-    const filehash = await calculateFileHash(`${process.env.CACHE_FOLDER}${documentName}`);
-    console.log("File hash: ", filehash)
+  console.log("Metadata: ", projectObject);
+  console.log("Document file: ", documentName);
+  console.log("Image file: ", imageName);
 
     let documentsArray = [];
     let imagesArray = [];
     if (projectObject.documentCount) {                                                     // When we would upgrade to multiple images and documents, here we would need a loop
       documentsArray.push({
-        path: `/${documentName}`,
+        name: `${documentName}`,
         content: fs.createReadStream(`${cacheFolder}/${documentName}`)                     // Document read stream
       })
     }
-    if (projectObject.documentCount) {
+    if (projectObject.imageCount) {
       imagesArray.push({
-        path: `/${imageName}`,
+        name: `${imageName}`,
         content: fs.createReadStream(`${cacheFolder}/${imageName}`)                        // Image read stream
       })         
     }
@@ -73,7 +71,21 @@ export async function GET(request: NextRequest) {
 
     // Create signable hash
 
+    const preparedObjectForSigning = {
+      project_id: projectId,
+      action_plan_id: actionPlanId,
+      nonce: nonce,
+      ancestor: ancestor,
+      project_name: projectObject.title,
+      description: projectObject.description,
+      documents: documentsArray,
+      images: imagesArray,
+      timestamp: Date.now(),
+    }
 
+    const signableObject = await createSignableObject(preparedObjectForSigning);
+    console.log("Signable Object: ", signableObject)
+writer.close();return;
     const asset = {
       project_id: projectId,
       action_plan_id: actionPlanId,
@@ -152,29 +164,4 @@ async function waitForFile(folderPath: string, fileName: string) {
       }
     }, 1000); // Check every 1 second
   });
-}
-
-
-async function calculateFileHash(filePath: string) {
-  try { console.log("filePath: ", filePath)
-    const hash = createHash('sha256');
-    const stream = fs.createReadStream(filePath);
-  
-    return new Promise((resolve, reject) => {
-      stream.on('data', (data) => {
-        hash.update(data);
-      });
-  
-      stream.on('end', () => {
-        const fileHash = hash.digest('hex');
-        resolve(fileHash);
-      });
-  
-      stream.on('error', (error) => {
-        reject(error);
-      });
-    });
-  } catch (error) {
-    console.error("Error hashing file: ", error);
-  }
 }

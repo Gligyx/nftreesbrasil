@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+import fs from 'fs';
 import conn from './db';
 import { ethers } from "ethers";
 
@@ -30,5 +32,56 @@ export async function verifySignature(signature: Signature, address: EthAddress)
     return verificationResult;
   } catch (error) {
     console.error("There was an error in the signature verification function: ", error);
+  }
+}
+
+export async function createSignableObject(inputObj: GeneralObject) {
+  console.log("inputObj: ", inputObj)
+
+  const signableObject: GeneralObject = {}
+  await Promise.all(Object.keys(inputObj).map(async (property) => {
+    if (!Array.isArray(inputObj[property])) {                                         // Convert every value to string, hash it
+      let value = "";
+      if (!inputObj[property]) value = "null";
+      if (typeof inputObj[property] === 'string' || typeof inputObj[property] === 'number') value = inputObj[property].toString();
+      const sha256Hex: string = createHash('sha256').update(value).digest('hex');
+      signableObject[property] = sha256Hex;
+    } else {                                                                          // Go through array of files, hash the file
+      const fileArray = inputObj[property];
+
+      signableObject[property] = await Promise.all(fileArray.map(async (fileEntry: FileEntry) => {
+        const hash = await calculateFileHash(fileEntry.name);
+        return {
+          fileName: fileEntry.name,
+          fileHash: hash
+        }
+      }));
+    }
+  }));
+
+  return signableObject;
+}
+
+async function calculateFileHash(fileName: string) {
+  try {
+    const hash = createHash('sha256');
+    const stream = fs.createReadStream(`${process.env.CACHE_FOLDER}${fileName}`);
+  
+    return new Promise((resolve, reject) => {
+      stream.on('data', (data) => {
+        hash.update(data);
+      });
+  
+      stream.on('end', () => {
+        const fileHash = hash.digest('hex');
+        resolve(fileHash);
+      });
+  
+      stream.on('error', (error: Error) => {
+        reject(error);
+      });
+    });
+  } catch (error) {
+    console.error("Error hashing file: ", error);
   }
 }

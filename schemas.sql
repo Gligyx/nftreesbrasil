@@ -19,7 +19,7 @@ UPDATE users SET nonce = (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM(
 
 
 -- Tables that are related to CO2.Storage
--- (Transfer.Storage)
+-- (Transfer.Storage) :
 
 -- This is the table that lists projects, this is not directly related to a CO2.Storage template
 -- This connects all the other tables, that's the idea
@@ -37,7 +37,8 @@ CREATE TABLE projects (
 CREATE TABLE action_plans (
     action_plan_id VARCHAR(23) PRIMARY KEY,
     project_id VARCHAR(20) NOT NULL,
-    project_owner VARCHAR(42) NOT NULL
+    project_owner VARCHAR(42) NOT NULL,
+    nonce INT NOT NULL
 );
 
 -- ActionPlans that made into an active project

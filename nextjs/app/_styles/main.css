@@ -3,7 +3,7 @@
 main {
   position: absolute;
   top: 70px;
-  margin: 24px;
+  padding: 24px;
   width: 100vw;
   height: calc(100vh - 70px - 0px);
   font-color: #222222;

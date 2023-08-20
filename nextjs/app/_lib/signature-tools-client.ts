@@ -1,7 +1,5 @@
 import { projectConfig } from "@/config";
-import { Signer } from "ethers";
-import conn from './db';
-import { ethers } from "ethers";
+import { Signer, ethers  } from "ethers";
 
 interface Window {
   ethereum?: any;
@@ -82,15 +80,22 @@ export async function loginWithSignature(signature: string) {
 
 // This is used on the front end, with the help of MetaMask
 export async function signMessage(inputMessage: string) {
-  const win: Window & typeof globalThis = window;
+  try {
+    const win: Window & typeof globalThis = window;
+  
+    if (typeof win.ethereum !== 'undefined') {
+      const accounts = await win.ethereum.request({ method: 'eth_requestAccounts'});
+      const signer = new ethers.BrowserProvider(win.ethereum).getSigner();
+      const signature = await (await signer).signMessage(inputMessage);
+      console.log("Signature: ", signature);
+      
+      return signature;
 
-  if (typeof win.ethereum !== 'undefined') {
-    const accounts = await win.ethereum.request({ method: 'eth_requestAccounts'});
-    const signer = new ethers.BrowserProvider(win.ethereum).getSigner();
-    const signature = await (await signer).signMessage(inputMessage);
-    console.log("Signature: ", signature);
-    return signature;
-  } else {
-    console.error("Couldn't find Metamask or other similar web3 wallet.");
+    } else {
+      throw "Couldn't find Metamask or other similar web3 wallet.";
+    }
+  } catch (error) {
+    console.error("Error in signMessage: ", error);
+    return false;
   }
 }

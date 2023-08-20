@@ -1,8 +1,8 @@
 'use client'
 import { useContext } from "react";
-import { AuthContext } from "../../_sharedComponents/AuthProvider";
-import AuthenticatedNav from '../../_sharedComponents/AuthenticatedNav';
-import NavWithLogin from "../../_sharedComponents/NavWithLogin";
+import { AuthContext } from "@/app/_sharedComponents/AuthProvider";
+import AuthenticatedNav from "@/app/_sharedComponents/AuthenticatedNav";
+import NavWithLogin from "@/app/_sharedComponents/NavWithLogin";
 
 
 export default function ExperimentalAreaThree() {

@@ -1,5 +1,5 @@
 'use client'
-import AuthProvider from "../../_sharedComponents/AuthProvider";
+import AuthProvider from "@/app/_sharedComponents/AuthProvider";
 import styles from "./experimental-area.module.css";
 
 interface ChildrenProps {

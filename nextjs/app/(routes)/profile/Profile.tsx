@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { deleteUserFromDatabase, fetchUserObject, getAddress, setNewUsername } from '../../_lib/user-tools';
-import "../../_styles/buttons.css";
-import styles from "./Profile.module.css";
+import { deleteUserFromDatabase, fetchUserObject, getAddress, setNewUsername } from '@/app/_lib/user-tools';
+import "@/app/_styles/buttons.css";
 import { AuthContext } from '@/app/_sharedComponents/AuthProvider';
+import styles from "./Profile.module.css";
 
 
 export default function Profile() {

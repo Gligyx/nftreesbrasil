@@ -1,34 +1,24 @@
 'use client'
 import React from 'react';
 import { useContext } from "react";
-import { AuthContext } from "../../_sharedComponents/AuthProvider";
-import UnauthenticatedNav from '../../_sharedComponents/UnauthenticatedNav';
-import AuthenticatedNav from '../../_sharedComponents/AuthenticatedNav';
-import LoginScreen from "../../_sharedComponents/LoginScreen";
+import { AuthContext } from "@/app/_sharedComponents/AuthProvider";
+import LoginScreen from "@/app/_sharedComponents/LoginScreen";
 import Profile from './Profile';
-import "../../_styles/main.css";
+import "@/app/_styles/main.css";
 
 
 
 export default function ProfilePage() {
-  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated } = useContext(AuthContext);
 
   
   return (
-    <>
-      {isAuthenticated? 
-        <AuthenticatedNav />
-      : 
-        <UnauthenticatedNav />
-      }
-
-      <main>
-        {isAuthenticated?
-          <Profile />
-        :
-          <LoginScreen />
-        }
-      </main>
+    <>    
+    {isAuthenticated?
+      <Profile />
+    :
+      <LoginScreen />
+    }
     </>
   )
 }

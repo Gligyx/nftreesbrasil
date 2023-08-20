@@ -78,3 +78,17 @@ interface SignableActionPlan {
   images: [],
   timestamp: number,
 }
+
+// Asset objects (ready to be deployed to CO2)
+interface ActionPlan {
+  project_id: ProjectId,
+  action_plan_id: ActionPlanId,
+  nonce: number,
+  ancestor: ActionPlanId | null,
+  project_name: string,
+  description: string,
+  documents: [],
+  images: [],
+  timestamp: number,
+  project_owner_signature: Signature
+}

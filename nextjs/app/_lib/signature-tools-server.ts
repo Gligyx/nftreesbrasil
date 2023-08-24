@@ -35,6 +35,7 @@ export async function verifySignature(signature: Signature, address: EthAddress)
   }
 }
 
+// OBSOLATE
 export async function createSignableObject(inputObj: GeneralObject) {
   console.log("inputObj: ", inputObj)
 
@@ -62,6 +63,7 @@ export async function createSignableObject(inputObj: GeneralObject) {
   return signableObject;
 }
 
+// MOST LIKELY NOT NEEDED
 async function calculateFileHash(fileName: string) {
   try {
     const hash = createHash('sha256');

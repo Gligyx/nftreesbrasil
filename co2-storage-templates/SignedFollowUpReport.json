@@ -13,10 +13,14 @@
   },
   "follow_up_report_object": {
     "type": "cid",
-    "mandatory":.true
+    "mandatory": true
   },
   "timestamp": {
-    "type"_ "datetime",
+    "type": "datetime",
+    "mandatory": true
+  },
+  "project_owner_address": {
+    "type": "string",
     "mandatory": true
   },
   "project_owner_signature": {
@@ -26,5 +30,5 @@
   "validator_signature_list": {
     "type": "json",
     "mandatory": true
-  },
+  }
 }

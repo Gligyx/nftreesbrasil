@@ -23,7 +23,7 @@ type Images = React.MutableRefObject<HTMLInputElement | null>;
 
 // ActionPlan data upload
 interface ActionPlanUploadObj {
-  projectId: string | null,
+  projectId: ProjectId | null,
   title: string, 
   description: string, 
   documentsRef: Documents, 
@@ -31,7 +31,7 @@ interface ActionPlanUploadObj {
   projectOwner: EthAddress
 }
 interface ActionPlanUploadObjReady {
-  projectId: string | undefined
+  projectId: ProjectId | undefined
   title: string, 
   description: string, 
   documentsRef: Documents, 
@@ -39,6 +39,25 @@ interface ActionPlanUploadObjReady {
   documentName: string, 
   imageName: string,
   projectOwner: EthAddress
+}
+
+// Comment data upload
+interface CommentUploadObj {
+  projectId: ProjectId,
+  actionPlanId: ActionPlanId,
+  actionPlanCID: string,
+  comment: string,
+  actionPlanSigner: EthAddress,
+  evaluatorAddress: EthAddress
+}
+interface CommentUploadObjReady {
+  commentName: string,
+  projectId: ProjectId,
+  actionPlanId: ActionPlanId,
+  actionPlanCID: string,
+  comment: string,
+  actionPlanSigner: EthAddress,
+  evaluatorAddress: EthAddress
 }
 
 type ToastId = React.MutableRefObject<string | number | null>;
@@ -56,6 +75,7 @@ interface InitProjectObject {
 // CO2.Storage asset IDs
 type ProjectId = string;                  // 20 character long string, example: Project-0123456789ab
 type ActionPlanId = string;               // 23 character long string, example: ActionPlan-0123456789ab
+type CommentId = string;                  // 20 character long string, example: Comment-0123456789ab
 
 
 // Object for hashing
@@ -76,10 +96,17 @@ interface SignableActionPlan {
   nonce: number,
   ancestor: ActionPlanId | null,
   project_name: string,
-  description: string,
-  documents: [],
-  images: [],
+  data: DataObjCid,
   timestamp: number,
+  project_owner_address: EthAddress
+}
+interface SignableComment {
+  project_id: ProjectId,
+  action_plan_id: ActionPlanId,
+  action_plan_cid: string,
+  comment: string,
+  comment_obj: DataObjCid,
+  evaluator_address: EthAddress
 }
 
 // Asset objects (ready to be deployed to CO2)
@@ -89,9 +116,37 @@ interface ActionPlan {
   nonce: number,
   ancestor: ActionPlanId | null,
   project_name: string,
+  data: DataObjCid,
+  timestamp: number,
+  project_owner_address: EthAddress,
+  project_owner_signature: Signature
+}
+interface CommentOnActionPlan {
+  project_id: ProjectId,
+  action_plan_id: ActionPlanId,
+  action_plan_cid: string,
+  comment: string,
+  comment_id: CommentId,
+  evaluator_signature: Signature
+}
+
+// When fetching on front end
+interface DocumentElement {
+  cid: string,
+  path: string,
+  size: number
+}
+interface ImageElement {
+  cid: string,
+  path: string,
+  size: number
+}
+
+// Replacable data object for ActionPlan
+interface DataObj {
   description: string,
   documents: [],
   images: [],
-  timestamp: number,
-  project_owner_signature: Signature
 }
+
+type DataObjCid = string;

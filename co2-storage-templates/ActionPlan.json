@@ -19,20 +19,16 @@
     "type": "string",
     "mandatory": true
   },
-  "description": {
-    "type": "text",
-    "mandatory": false
-  },
-  "documents": {
-    "type": "documents",
-    "mandatory": false
-  },
-  "images": {
-    "type": "images",
+  "data": {
+    "type": "cid",
     "mandatory": false
   },
   "timestamp": {
     "type": "datetime",
+    "mandatory": true
+  },
+  "project_owner_address": {
+    "type": "string",
     "mandatory": true
   },
   "project_owner_signature": {

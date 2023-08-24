@@ -19,6 +19,10 @@
     "type": "datetime",
     "mandatory": true
   },
+  "project_owner_address": {
+    "type": "string",
+    "mandatory": true
+  },
   "project_owner_signature": {
     "type": "string",
     "mandatory": true

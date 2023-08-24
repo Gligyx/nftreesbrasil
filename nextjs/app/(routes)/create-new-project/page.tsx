@@ -5,11 +5,11 @@ import { AuthContext } from "@/app/_sharedComponents/AuthProvider";
 import LoginScreen from "@/app/_sharedComponents/LoginScreen";
 import { startActionPlanCreation } from '@/app/_lib/actionPlanCreation';
 import { Id, toast } from 'react-toastify';
-import "@/app/_styles/main.css";
 import { getAddress } from '@/app/_lib/user-tools';
+import "@/app/_styles/main.css";
 
 
-export default function ProfilePage() {
+export default function CreateNewProjectPage() {
   const { isAuthenticated } = useContext(AuthContext);
   const toastId = React.useRef<Id | null>(null);
   const [title, setTitle] = useState<string>("");
@@ -37,7 +37,7 @@ export default function ProfilePage() {
 
     const address = await getAddress();
     if (address === -1) toast.error("Could not connect to MetaMask!");
-    let projectId = "Project-da4402c101f5";
+    let projectId = null;//"Project-da4402c101f5";
 
     startActionPlanCreation(toastId, {
       projectId: projectId || null,

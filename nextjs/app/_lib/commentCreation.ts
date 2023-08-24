@@ -1,42 +1,38 @@
 import { projectConfig } from "@/config"
 import { Id, toast } from "react-toastify";
 import { signMessage } from "./signature-tools-client";
-import { redirect } from 'next/navigation';
 
 
-export async function startActionPlanCreation(toastId: ToastId, uploadObj: ActionPlanUploadObj) {
+export async function startCommentCreation(toastId: ToastId, uploadObj: CommentUploadObj) {
   // Start SSE connection (Server Sent Events)
-  const eventSource = new EventSource(`${projectConfig.serverAddress}/api/action-plan/main`);
+  const eventSource = new EventSource(`${projectConfig.serverAddress}/api/comment/main`);
 
   // Notify the user that the process has started
-  toastId.current = toast.info("Creating new ActionPlan...", {
+  toastId.current = toast.info("Commenting on ActionPlan...", {
     autoClose: false,
     closeButton: false
   });
-  
+
   // Handle all non-error messages
   eventSource.onmessage = async (event) => {
     const message = JSON.parse(event.data);
     console.log("The Message: ", message);
-    
 
-    // Server asked for data (name, desc, and optional files)
-    if (message.startFileUpload) {
+    // Server asked for data
+    if (message.sendData) {
       uploadData({
-        projectId: uploadObj.projectId || undefined,
-        title: uploadObj.title,
-        description: uploadObj.description,
-        documentsRef: uploadObj.documentsRef,
-        imagesRef: uploadObj.imagesRef,
-        documentName: message.documentName,
-        imageName: message.imageName,
-        projectOwner: uploadObj.projectOwner as EthAddress
+        commentName: message.commentName,
+        projectId: uploadObj.projectId,
+        actionPlanId: uploadObj.actionPlanId,
+        actionPlanCID: uploadObj.actionPlanCID,
+        comment: uploadObj.comment,
+        actionPlanSigner: uploadObj.actionPlanSigner,
+        evaluatorAddress: uploadObj.evaluatorAddress  
       });
 
       toast.update(toastId.current as Id, {
         render: "Uploading data to server...",
         type: toast.TYPE.INFO,
-        autoClose: false
       });
     }
 
@@ -50,7 +46,7 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
 
     if (message.sendSignature) {
       toast.update(toastId.current as Id, {
-        render: "Please sign the ActionPlan asset!",
+        render: "Please sign the Comment asset!",
         type: toast.TYPE.INFO,
         autoClose: false
       });
@@ -67,7 +63,7 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
         return;
       }
       
-      sendSignature(signedMessage, message.actionPlanId);
+      sendSignature(signedMessage, message.commentId);
     }
 
     if (message.signatureReceived) {
@@ -105,40 +101,27 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
       });
     }
 
-    if (message.updatingDatabase) {
+    if (message.signatureError) {
       toast.update(toastId.current as Id, {
-        render: "Updating database...",
-        type: toast.TYPE.INFO,
+        render: "The signature of the ActionPlan is not valid!",
+        type: toast.TYPE.ERROR,
       });
+      eventSource.close();
     }
 
-    
     // Server said: close connection    
     if (message.done) {
       console.log('Closing connection...');
       toast.update(toastId.current as Id, {
-        render: "New Action Plan created successfuly!",
+        render: "New Comment created successfuly!",
         type: toast.TYPE.SUCCESS,
         autoClose: 5000
       });
       eventSource.close();
 
-      // Redirect to ActionPlan page (nextjs redirect not working)
-      const redirectUrl = `/action-plan-list/${message.actionPlanId}`;
-      setTimeout(() => window.location.replace(redirectUrl), 3000)
-    }
-    
-    // Server said: error (also close connection)
-    if (message.error) {
-      toast.update(toastId.current as Id, {
-        render: "There was an error while creating the Action Plan",
-        type: toast.TYPE.ERROR,
-      });
-      console.error("There was an error while creating the Action Plan: ", message.error)
-      eventSource.close();
+      // Refresh
     }
   }
-  
 
   // Handle error messages
   eventSource.onerror = (error) => {
@@ -147,34 +130,25 @@ export async function startActionPlanCreation(toastId: ToastId, uploadObj: Actio
     toast.update(toastId.current as Id, {
       render: "An error occurred during SSE connection",
       type: toast.TYPE.ERROR
-    });
+    })
     eventSource.close();
   }
 }
 
-
-async function uploadData(uploadObj: ActionPlanUploadObjReady) {
+async function uploadData(uploadObj: CommentUploadObjReady) {
   console.log("Data upload is starting...");
   try {
-    const url = `${projectConfig.serverAddress}/api/action-plan/data-upload`;
+    const url = `${projectConfig.serverAddress}/api/comment/data-upload`;
   
     // These elements will be always added
     const formData = new FormData();
-    formData.append('title', uploadObj.title);
-    formData.append('description', uploadObj.description);
-    formData.append('owner', uploadObj.projectOwner);
-    if (uploadObj.projectId) formData.append('project-id', uploadObj.projectId);
-    
-    // documentName is a placeholder, in case there is no document, so the signaling process can go on
-    if (uploadObj.documentsRef?.current?.files?.length === 0) formData.append('documentName', uploadObj.documentName);    // If no file, upload placeholder name
-    else if (uploadObj.documentsRef && uploadObj.documentsRef.current && uploadObj.documentsRef.current.files)
-      formData.append('documents', uploadObj.documentsRef.current.files[0], uploadObj.documentName);                      // else upload file
-    
-    // imageName is a placeholder, in case there is no document, so the signaling process can go on
-    if (uploadObj.imagesRef?.current?.files?.length === 0) formData.append('imageName', uploadObj.imageName);             // If no file, upload placeholder name
-    else if (uploadObj.imagesRef && uploadObj.imagesRef.current && uploadObj.imagesRef.current.files)
-      formData.append('images', uploadObj.imagesRef.current.files[0], uploadObj.imageName);                               // else upload file
-    
+    formData.append('comment-name', uploadObj.commentName);
+    formData.append('action-plan-id', uploadObj.actionPlanId);
+    formData.append('action-plan-cid', uploadObj.actionPlanCID);
+    formData.append('comment', uploadObj.comment);
+    formData.append('project-owner-address', uploadObj.actionPlanSigner);
+    formData.append('validator-address', uploadObj.evaluatorAddress);
+
     const response = await fetch(url, {
       method: 'POST',
       body: formData

@@ -13,3 +13,10 @@ export function createActionPlanId(signableObject: object): ActionPlanId {
 
   return `ActionPlan-${actionPlanIdHex}`;
 }
+
+export function createCommentId(signableObject: object): CommentId {
+  const sha256Hex: string = createHash('sha256').update(JSON.stringify(signableObject)).digest('hex');
+  const commentIdHex = sha256Hex.slice(sha256Hex.length-12, sha256Hex.length);
+
+  return `Comment-${commentIdHex}`
+}

@@ -8,4 +8,4 @@ const ipfsNodeAddr = "/dns4/web1.co2.storage/tcp/5002/https"
 const fgApiUrl = "https://web1.co2.storage"
 
 export const fgStorage = new FGStorage({authType: authType, ipfsNodeType: ipfsNodeType, ipfsNodeAddr: ipfsNodeAddr, fgApiHost: fgApiUrl})
-export const chainName = 'hello-world';
+export const chainName = 'test-42';

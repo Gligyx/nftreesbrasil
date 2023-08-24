@@ -7,10 +7,10 @@ export async function POST(request: NextRequest) {
     if (request.method !== 'POST') throw "Method not allowed";
     const requestObject = await request.json();
     const signature = requestObject.signature;
-    const actionPlanId = requestObject.actionPlanId;
+    const commentId = requestObject.commentId;
 
     // We signal to main that we are done
-    fs.writeFileSync(process.env.CACHE_FOLDER + actionPlanId + ".done", JSON.stringify({ signature }));
+    fs.writeFileSync(process.env.CACHE_FOLDER + commentId + ".done", JSON.stringify({ signature }));
 
     return NextResponse.json({
       success: true

@@ -18,7 +18,15 @@
   "comment": {
     "type": "text",
     "mandatory": true
-  }, 
+  },
+  "comment_obj": {
+    "type": "cid",
+    "mandatory": false
+  },
+  "evaluator_address": {
+    "type": "string",
+    "mandatory": true
+  },
   "evaluator_signature": {
     "type": "string",
     "mandatory": true

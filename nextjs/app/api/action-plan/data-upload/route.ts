@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const { createHash } = require('crypto');
 import fs from 'fs';
 import conn from "@/app/_lib/db";
-import { createProjectId } from "@/app/_lib/actionPlanTools";
+import { createProjectId } from "@/app/_lib/idTools";
 
 
 export async function POST(request: NextRequest) {
@@ -30,6 +30,11 @@ export async function POST(request: NextRequest) {
       documentCount: documents? 1 : 0,                                            // We can't upload multiple files yet
       imageCount: images? 1 : 0
     }
+
+    // Create ProjectId
+    const projectId: ProjectId =  origProjectId || createProjectId(projectObject);
+    projectObject.projectId = projectId;
+
   
     // Process Document(s) (currently we can only take 1 document)
     if (!documents) {
@@ -46,9 +51,6 @@ export async function POST(request: NextRequest) {
     } else {
       uploadFile(images, projectObject);
     }
-
-    // Create ProjectId
-    const projectId: ProjectId =  origProjectId || createProjectId(projectObject);
 
     // Create database entry
     if (!origProjectId) {

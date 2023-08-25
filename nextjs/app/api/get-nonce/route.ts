@@ -1,12 +1,12 @@
 export const dynamic = 'force-dynamic' 
 import { NextRequest, NextResponse } from 'next/server';
-import conn from "@/app/_lib/db";
+import postgres from "@/app/_lib/db";
 
 
 export async function GET(request: NextRequest) {
   try {
     // Check if database connection object exists
-    if (!conn) throw "Couldn't connect to database";
+    if (!postgres) throw "Couldn't connect to database";
   
     // Get address from URL params
     const address_from_front_end: MaybeEthAddress = (request.nextUrl.searchParams.get("address") as unknown) as string;
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   
     // Query the database
     const query = `SELECT * FROM users WHERE eth_address = '${address}';`
-    const result = await conn.query(query);
+    const result = await postgres.query(query);
   
     // Get nonce
     let rows = result.rows;
@@ -25,9 +25,9 @@ export async function GET(request: NextRequest) {
       // Most likely this is a new user. We will create a new entry in the database!
       if (rows.length === 0) {
         console.log("Registering new user...");
-        const insertQuery = await conn.query(`INSERT INTO users (nonce, eth_address, role) VALUES (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM()::BIGINT % 1000000), '${address}', 'User');`);
+        const insertQuery = await postgres.query(`INSERT INTO users (nonce, eth_address, role) VALUES (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM()::BIGINT % 1000000), '${address}', 'User');`);
         if (insertQuery.rowCount !== 1) throw "There was an error while inserting new user into the database!";
-        const readBackNonceQuery = await conn.query(`SELECT * FROM users WHERE eth_address = '${address}';`);
+        const readBackNonceQuery = await postgres.query(`SELECT * FROM users WHERE eth_address = '${address}';`);
         rows = readBackNonceQuery.rows;
         if (rows.length !== 1) throw "Error while reading back the newly inserted nonce!";
       }

@@ -6,7 +6,7 @@ Protocol is `co2.storage`, which might be soon renamed to `transform.storage`
 For testing, we are using the `test42` namespace.  
 Testnet template CIDS: [  
   ActionPlan: `bafyreig6d4crklazqqso33z5vbnioedhregjlapvq5grwtsw6tdy75avpu`  
-  AcceptedActionPlan: `bafyreifuamdjskvq6pbyfoxsexgg6zfrzivroyqfzirklxl6wdzvh7mxrq`  
+  AcceptedActionPlan: `bafyreifmyr7xxzuihviowr4blj4ksqqe4zdfpny6efbrtjimjptlvhf3qa`  
   CommentOnActionPlan: `bafyreibp7mxzqib2cr6d7xrtcmubcm3dffrnvu3jpp2tqujihvouadqgoa`  
   ProgressReport: `bafyreiecxht6ijbsmvd5iw763nzygmbvnpngwi6rjhf4wwfamrguqfkwgy`  
   FinishedProject: `bafyreidlksmadmd7jqdhzbqjylz7hvjvrhdfrssbx5liviwfaa3bkrrvwu`  

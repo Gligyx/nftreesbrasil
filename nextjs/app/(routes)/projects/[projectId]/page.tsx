@@ -14,7 +14,7 @@ export default function ProjectDashboardPage({ params }: Props) {
     <>
       <h1>Project: {params.projectId}</h1>
       <p>Dynamically do the things</p>
-      <p>"newest associated action plan" and things like that</p>
+      <p>newest associated action plan and things like that</p>
     </>
   )
 }

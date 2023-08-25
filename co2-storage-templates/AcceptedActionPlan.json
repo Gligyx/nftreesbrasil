@@ -19,10 +19,6 @@
     "type": "datetime",
     "mandatory": true
   },
-  "evaluator_address": {
-    "type": "string",
-    "mandatory": true
-  },
   "evaluator_signature": {
     "type": "string",
     "mandatory": true

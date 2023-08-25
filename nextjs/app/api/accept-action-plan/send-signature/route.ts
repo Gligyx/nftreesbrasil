@@ -8,17 +8,17 @@ export async function POST(request: NextRequest) {
     if (request.method !== 'POST') throw "Method not allowed";
     const requestObject = await request.json();
     const signature = requestObject.signature;
-    const actionPlanId = requestObject.actionPlanId;
+    const acceptedId = requestObject.acceptedActionPlanId;
 
     // We signal to main that we are done
-    fs.writeFileSync(process.env.CACHE_FOLDER + actionPlanId + ".done", JSON.stringify({ signature }));
+    fs.writeFileSync(process.env.CACHE_FOLDER + acceptedId + ".done", JSON.stringify({ signature }));
 
     return NextResponse.json({
       success: true
     });
 
   } catch (error) {
-    console.error("There was an error while sending signature for new ActionPlan: ", error);
+    console.error("There was an error while sending signature for AcceptedActionPlan: ", error);
     return NextResponse.json({
       error,
     }, {

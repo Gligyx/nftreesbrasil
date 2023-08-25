@@ -1,6 +1,7 @@
+export const dynamic = 'force-dynamic'
 import { chainName, fgStorage } from "@/app/_lib/co2Conn";
 import { createActionPlanSignatureMessage, createCommentSignatureMessage } from "@/app/_lib/signatureMessages";
-import { ethers } from "ethers";
+import { ethers } from "ethers-new";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -14,9 +15,9 @@ export async function GET(request: NextRequest) {
 
     // At this point, we can have multiple asset IDs, but we need to handle them differently
 
-    const searchResponse = await fgStorage.search(chainName, null, null, null, null, assetId, null, null, null, null, signerAddress);
+    const searchResponse = await fgStorage.search(chainName, null, null, null, null, assetId, null, null, null, null, process.env.ADDRESS);
     if (searchResponse.error) throw searchResponse.error;
-
+  
     const assetResponse = await fgStorage.getAsset(searchResponse.result[0].cid);
     if (assetResponse.error) throw assetResponse.error;
 
@@ -29,7 +30,6 @@ export async function GET(request: NextRequest) {
 
     if (assetId.includes("ActionPlan")) {
       // Treat it as ActionPlan
-
       const obj: SignableActionPlan = {
         project_id: resultObj.project_id,
         nonce: resultObj.nonce,
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         timestamp: resultObj.timestamp,
         project_owner_address: resultObj.project_owner_address
       }
-
+      
       const message = createActionPlanSignatureMessage(obj);
       const isSigValid = verifyAssetSignature(resultObj.project_owner_signature, message, resultObj.project_owner_address);
 
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
 
 
 
-export function verifyAssetSignature(signature: Signature, message: string, address: EthAddress) {
+function verifyAssetSignature(signature: Signature, message: string, address: EthAddress) {
   try {    
     // Verify the signature
     const recoveredAddress = ethers.verifyMessage(message, signature);

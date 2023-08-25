@@ -18,7 +18,7 @@ export default async function ActionPlanListPage() {
     <>
       <h1>Action Plan List</h1>
       <ul>
-        {actionPlanList.map((actionPlan) => <li>
+        {actionPlanList.map((actionPlan, index) => <li key={index}>
           {actionPlan}
         </li>)}
       </ul>

@@ -1,11 +1,11 @@
 export const dynamic = 'force-dynamic' 
-import conn from "@/app/_lib/db";
+import postgres from "@/app/_lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 
 export async function GET(request: NextRequest) {
   try {
-    if (!conn) throw "Couldn't connect to database";
+    if (!postgres) throw "Couldn't connect to database";
     
     // Get address from URL params
     const address_from_front_end: MaybeEthAddress = request.nextUrl.searchParams.get("address");
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     // Query the database
     const query = `SELECT * FROM users WHERE eth_address = '${address}'`;
-    const result = await conn.query(query);
+    const result = await postgres.query(query);
     let rows = result.rows;
     if (rows.length !== 1) throw "Address not found.";
 

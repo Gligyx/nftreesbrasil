@@ -1,9 +1,9 @@
 import { Pool } from 'pg';
 
-let conn: Pool | undefined;
+let postgres: Pool | undefined;
 
-if (!conn) {
-  conn = new Pool({
+if (!postgres) {
+  postgres = new Pool({
     user: process.env.PGSQL_USER,
     password: process.env.PGSQL_PASSWORD,
     host: process.env.PGSQL_HOST,
@@ -12,4 +12,4 @@ if (!conn) {
   })
 }
 
-export default conn;
+export default postgres;

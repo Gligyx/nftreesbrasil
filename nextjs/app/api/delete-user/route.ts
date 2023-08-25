@@ -1,13 +1,13 @@
 export const dynamic = 'force-dynamic' 
 import { NextRequest, NextResponse } from "next/server";
-import conn from "@/app/_lib/db";
+import postgres from "@/app/_lib/db";
 import { jwtAuth } from "@/app/_lib/jwtAuth";
 
 
 export async function DELETE(request: NextRequest) {
   try {
     if (request.method !== 'DELETE') throw "Method not allowed";
-    if (!conn) throw "Couldn't connect to database";
+    if (!postgres) throw "Couldn't connect to database";
     const requestObject = await request.json();
     
     const address: EthAddress = requestObject.address.toLocaleLowerCase();
@@ -18,7 +18,7 @@ export async function DELETE(request: NextRequest) {
 
     // Delete user from database
     const deleteQuery = `DELETE FROM users WHERE eth_address = '${address}'`;
-    const deleteResult = await conn.query(deleteQuery);
+    const deleteResult = await postgres.query(deleteQuery);
     if (deleteResult.rowCount !== 1) throw "Error while executing SQL query!";
 
     return NextResponse.json({

@@ -20,3 +20,9 @@ export function createCommentId(signableObject: object): CommentId {
 
   return `Comment-${commentIdHex}`
 }
+
+export function createAcceptedActionPlanId(actionPlanId: ActionPlanId): AcceptedActionPlanId {
+  const idHex = actionPlanId.slice(actionPlanId.length-12, actionPlanId.length);
+
+  return `AcceptedAP-${idHex}`
+}

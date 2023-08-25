@@ -5,6 +5,7 @@ import "@/app/_styles/main.css";
 import { projectConfig } from '@/config';
 import Image from "next/image";
 import Comment from "./Comment";
+import AcceptActionPlan from "./AcceptActionPlan";
 
 interface Props {
   params: {
@@ -13,8 +14,10 @@ interface Props {
 }
 
 async function fetchActionPlan(id: ActionPlanId) {
+  console.log("Fetching ActionPlan asset...");
   const response = await fetch(`${projectConfig.serverAddress}/api/co2/get-action-plan?id=${id}`);
   const json = await response.json();
+
   if (json.error) return null;
 
   const asset: ActionPlan = json.asset;
@@ -25,6 +28,7 @@ async function fetchActionPlan(id: ActionPlanId) {
 async function fetchCid(id: ActionPlanId) {
   const response = await fetch(`${projectConfig.serverAddress}/api/co2/get-action-plan?id=${id}`);
   const json = await response.json();
+  
   if (json.error) return null;
 
   const cid: string = json.assetCID;
@@ -36,8 +40,6 @@ async function fetchCid(id: ActionPlanId) {
 export default async function ActionPlanPage({ params }: Props) {
   const actionPlan: ActionPlan | null = await fetchActionPlan(params.actionPlanId);
   const actionCID: string | null = await fetchCid(params.actionPlanId);
-
-  console.log(actionPlan)
 
   if (actionPlan === null || actionCID === null) return <p>Error</p>
   
@@ -69,8 +71,8 @@ export default async function ActionPlanPage({ params }: Props) {
         {/*<p>
           {"Documents"}
           <ul>
-            {actionPlan.documents.map((document: DocumentElement) => (
-              <li>{document.path}</li>
+            {actionPlan.documents.map((document: DocumentElement, index: number) => (
+              <li key={index}>{document.path}</li>
             ))}
           </ul>
         </p>
@@ -78,8 +80,8 @@ export default async function ActionPlanPage({ params }: Props) {
         <p>
           {"Images"}
           <ul>
-            {actionPlan.images.map((image: ImageElement) => (
-              <li style={{width: "25vw"}}>
+            {actionPlan.images.map((image: ImageElement, index: number) => (
+              <li key={index} style={{width: "25vw"}}>
                 <Image 
                   src={`https://ipfs.io/ipfs/${image.cid}`}
                   alt={image.path}
@@ -93,7 +95,11 @@ export default async function ActionPlanPage({ params }: Props) {
         
         
           {actionCID && "validator" &&     
-            <Comment actionPlan={actionPlan} cid={actionCID} />
+            <>
+              <Comment actionPlan={actionPlan} cid={actionCID} />
+
+              <AcceptActionPlan actionPlan={actionPlan} cid={actionCID} />
+            </>
           }
         
         

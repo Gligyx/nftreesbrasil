@@ -2,13 +2,13 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from "next/server";
 const { createHash } = require('crypto');
 import fs from 'fs';
-import conn from "@/app/_lib/db";
+import postgres from "@/app/_lib/db";
 import { createProjectId } from "@/app/_lib/idTools";
 
 
 export async function POST(request: NextRequest) {
   try {
-    if (!conn) throw "Couldn't connect to database";                  // Check if database connection object exists
+    if (!postgres) throw "Couldn't connect to database";                  // Check if database connection object exists
 
     const formData = await request.formData();
     if (!process.env.CACHE_FOLDER) throw "No cache folder specified! Check .env!";
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     // Create database entry
     if (!origProjectId) {
       const saveProjectQuery = `INSERT INTO projects (project_id, project_name, project_owner) VALUES ('${projectId}', '${title}', '${address}')`
-      const saveResult = await conn.query(saveProjectQuery);
+      const saveResult = await postgres.query(saveProjectQuery);
       if (saveResult.rowCount !== 1) throw "Error while saving project info to database!";
     }
 

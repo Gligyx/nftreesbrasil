@@ -27,6 +27,7 @@ CREATE TABLE projects (
     project_id VARCHAR(20) PRIMARY KEY,
     project_name TEXT NOT NULL,
     accepted_action_plan VARCHAR(23),
+    hypercert_created boolean,
     finished_id VARCHAR(22),
     signed_finished_id VARCHAR(21),
     project_owner VARCHAR(42) NOT NULL
@@ -65,7 +66,7 @@ CREATE TABLE finished_projects (
 --We will use Type-[12-char-sha256-portion]
 -- Project-0123456789ab        -   ProjectId
 -- ActionPlan-0123456789ab     -   ActionPlanId
--- -                           -   [AcceptedActionPlan object does not have an ID (but there is an ActionPlan, which is accepted). Probably this is not good.]
+-- AcceptedAP-0123456789ab     -   AcceptedActionPlanId (Same as ActionPlanId, but with different prefix)
 -- Comment-0123456789ab        -   CommentId
 -- Progress-0123456789ab       -   ProgressReportId
 -- Finished-01234567890ab      -   FinishedProjectId

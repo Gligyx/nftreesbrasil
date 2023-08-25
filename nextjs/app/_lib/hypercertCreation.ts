@@ -3,12 +3,13 @@ import { Id, toast } from "react-toastify";
 import { signMessage } from "./signature-tools-client";
 
 
-export async function startCommentCreation(toastId: ToastId, uploadObj: CommentUploadObj) {
+// This will also create an AcceptedActionPlan asset on CO2.Storage
+export async function startHypercertCreation(toastId: ToastId, uploadObj: AcceptedActionPlanUploadObj) {
   // Start SSE connection (Server Sent Events)
-  const eventSource = new EventSource(`${projectConfig.serverAddress}/api/comment/main`);
+  const eventSource = new EventSource(`${projectConfig.serverAddress}/api/accept-action-plan/main`);
 
   // Notify the user that the process has started
-  toastId.current = toast.info("Commenting on ActionPlan...", {
+  toastId.current = toast.info("Accepting ActionPlan...", {
     autoClose: false,
     closeButton: false
   });
@@ -21,13 +22,13 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
     // Server asked for data
     if (message.sendData) {
       uploadData({
-        commentName: message.commentName,
+        acceptedApName: message.acceptedApName,
         projectId: uploadObj.projectId,
         actionPlanId: uploadObj.actionPlanId,
         actionPlanCID: uploadObj.actionPlanCID,
-        comment: uploadObj.comment,
+        acceptedBy: uploadObj.acceptedBy,  // evaluator_address
         actionPlanSigner: uploadObj.actionPlanSigner,
-        evaluatorAddress: uploadObj.evaluatorAddress  
+        timestamp: uploadObj.timestamp,
       });
 
       toast.update(toastId.current as Id, {
@@ -46,7 +47,7 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
 
     if (message.sendSignature) {
       toast.update(toastId.current as Id, {
-        render: "Please sign the Comment asset!",
+        render: "Please sign the AcceptActionPlan asset!",
         type: toast.TYPE.INFO,
         autoClose: false
       });
@@ -63,7 +64,7 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
         return;
       }
       
-      sendSignature(signedMessage, message.commentId);
+      sendSignature(signedMessage, message.acceptedId);
     }
 
     if (message.signatureReceived) {
@@ -101,6 +102,13 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
       });
     }
 
+    if (message.createHypercertStart) {
+      toast.update(toastId.current as Id, {
+        render: "Creating hypercert...",
+        type: toast.TYPE.INFO,
+      });
+    }
+
     if (message.signatureError) {
       toast.update(toastId.current as Id, {
         render: "The signature of the ActionPlan is not valid!",
@@ -109,11 +117,19 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
       eventSource.close();
     }
 
+    if (message.hypercertExists) {
+      toast.update(toastId.current as Id, {
+        render: "Hypercert for this asset already exists!",
+        type: toast.TYPE.INFO,
+      });
+      eventSource.close();
+    }
+
     // Server said: close connection    
     if (message.done) {
       console.log('Closing connection...');
       toast.update(toastId.current as Id, {
-        render: "New Comment created successfuly!",
+        render: "Hypercert created! This project is now live!",
         type: toast.TYPE.SUCCESS,
         autoClose: 5000
       });
@@ -121,18 +137,17 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
 
       // Refresh
     }
-    
-    // Server said: error (also close connection)
+
+    // Server sent error message
     if (message.error) {
       toast.update(toastId.current as Id, {
-        render: "There was an error while creating Comment",
+        render: "There was an error while accepting the Action Plan",
         type: toast.TYPE.ERROR,
       });
-      console.error("There was an error while creating Comment: ", message.error)
+      console.error("There was an error while accepting the ActionPlan: ", message.error)
       eventSource.close();
     }
   }
-
 
   // Handle error messages
   eventSource.onerror = (error) => {
@@ -141,25 +156,24 @@ export async function startCommentCreation(toastId: ToastId, uploadObj: CommentU
     toast.update(toastId.current as Id, {
       render: "An error occurred during SSE connection",
       type: toast.TYPE.ERROR
-    })
+    });
     eventSource.close();
   }
 }
 
-async function uploadData(uploadObj: CommentUploadObjReady) {
+async function uploadData(uploadObj: AcceptedActionPlanUploadObjReady) {
   console.log("Data upload is starting...");
   try {
-    const url = `${projectConfig.serverAddress}/api/comment/data-upload`;
+    const url = `${projectConfig.serverAddress}/api/accept-action-plan/data-upload`;
   
-    // These elements will be always added
     const formData = new FormData();
-    formData.append('comment-name', uploadObj.commentName);
+    formData.append('accepted-ap-name', uploadObj.acceptedApName);
+    formData.append('project-id', uploadObj.projectId);
     formData.append('action-plan-id', uploadObj.actionPlanId);
     formData.append('action-plan-cid', uploadObj.actionPlanCID);
-    formData.append('comment', uploadObj.comment);
+    formData.append('accepted-by', uploadObj.acceptedBy);
     formData.append('project-owner-address', uploadObj.actionPlanSigner);
-    formData.append('validator-address', uploadObj.evaluatorAddress);
-
+    
     const response = await fetch(url, {
       method: 'POST',
       body: formData
@@ -170,13 +184,13 @@ async function uploadData(uploadObj: CommentUploadObjReady) {
     else throw "There was an error while uploading data"
     
   } catch (error) {
-    console.error("There was an error while creating new ActionPlan: ", error);
+    console.error("There was an error while creating AcceptedActionPlan: ", error);
   }
 }
 
-async function sendSignature(signedMessage: string, actionPlanId: ActionPlanId) {
+async function sendSignature(signedMessage: string, acceptedApId: AcceptedActionPlanId) {
   try {
-    const url = `${projectConfig.serverAddress}/api/action-plan/send-signature`;
+    const url = `${projectConfig.serverAddress}/api/accept-action-plan/send-signature`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -185,7 +199,7 @@ async function sendSignature(signedMessage: string, actionPlanId: ActionPlanId) 
       },
       body: JSON.stringify({
         signature: signedMessage,
-        actionPlanId: actionPlanId
+        acceptedActionPlanId: acceptedApId
       })
     });
 
@@ -193,6 +207,6 @@ async function sendSignature(signedMessage: string, actionPlanId: ActionPlanId) 
     else throw "There was an error while sending signature";
 
   } catch (error) {
-    console.error("There was an error while tring to send signed Comment to server: ", error);
+    console.error("There was an error while tring to send signed AcceptedActionPlan to server: ", error);
   }
 }

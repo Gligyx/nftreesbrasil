@@ -55,7 +55,7 @@ async function executeCommentWorkflow(writer: WritableStreamDefaultWriter<any>, 
     }
   
     const preparedAsset = await prepareAsset(commentObject);
-    if (preparedAsset === -2) throw "Error while creating assetToHash";
+    if (preparedAsset === -2) throw "Error while creating preparedAsset";
 
     const signableObject: SignableComment = preparedAsset;
     const commentId: CommentId = createCommentId(signableObject);

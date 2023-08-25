@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic' 
 import { NextRequest, NextResponse } from "next/server";
 import fs from 'fs';
-import conn from "@/app/_lib/db";
+import postgres from "@/app/_lib/db";
 import { chainName, fgStorage } from "@/app/_lib/co2Conn";
 import { createActionPlanId, createProjectId } from "@/app/_lib/idTools";
 import { createActionPlanSignatureMessage } from "@/app/_lib/signatureMessages";
@@ -189,12 +189,12 @@ async function prepareAsset(projectObject: InitProjectObject, dataCid: DataObjCi
     const projectId: ProjectId = projectObject.projectId || createProjectId(projectObject);
     console.log("ProjectId: ", projectId);
   
-    if (!conn) throw "Could not connect to database";
+    if (!postgres) throw "Could not connect to database";
     const sameProjectQuery = `SELECT * FROM action_plans WHERE project_id = '${projectId}' AND project_owner = '${projectObject.address}'`;
-    const queryResult = await conn.query(sameProjectQuery);
+    const queryResult = await postgres.query(sameProjectQuery);
     let nonce = queryResult.rowCount;
     const getNonceQuery = `SELECT * FROM action_plans WHERE nonce = ${nonce-1}`;
-    const getNonceResult = await conn.query(getNonceQuery);
+    const getNonceResult = await postgres.query(getNonceQuery);
     let ancestor = null;
     if (getNonceResult.rowCount) ancestor = getNonceResult.rows[0]["action_plan_id"];
 
@@ -255,14 +255,14 @@ async function createAsset(writer: WritableStreamDefaultWriter<any>, encoder: Te
           console.log("Asset created");
 
           // Update database
-          if (!conn) throw "Could not connect to database.";
+          if (!postgres) throw "Could not connect to database.";
           const updateDatabase = `INSERT INTO action_plans (project_id, action_plan_id, project_owner, nonce) VALUES (
             '${asset.project_id}',
             '${asset.action_plan_id}',
             '${projectOwner}',
             ${asset.nonce}
           )`;
-          const updateResult = await conn.query(updateDatabase);
+          const updateResult = await postgres.query(updateDatabase);
           if (updateResult.rowCount !== 1) throw "Error saving new entry to database.";
 
           cleanUp(asset.action_plan_id, documentsArray, imagesArray);

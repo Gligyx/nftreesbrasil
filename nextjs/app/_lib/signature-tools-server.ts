@@ -1,18 +1,18 @@
 import { createHash } from 'crypto';
 import fs from 'fs';
-import conn from './db';
-import { ethers } from "ethers";
+import postgres from './db';
+import { ethers } from 'ethers-new';
 
 
 // Here we will verify signature, this does not happen on the route itself.
 // This will happen on the back end
 export async function verifySignature(signature: Signature, address: EthAddress) {
   try {
-    if (!conn) throw "Couldn't connect to database";
+    if (!postgres) throw "Couldn't connect to database";
     
     // Get nonce from database and create the same message that was signed by the user
     const query = `SELECT * FROM users WHERE eth_address = '${address}';`
-    const result = await conn.query(query);
+    const result = await postgres.query(query);
     const rows = result.rows;
     if (rows.length !== 1) throw "Address couldn't be find in database (rows.length is not 1)";
     const nonce: Nonce = rows[0].nonce;
@@ -26,7 +26,7 @@ export async function verifySignature(signature: Signature, address: EthAddress)
 
     // Reset nonce in database
     const resetNonceQuery = `UPDATE users SET nonce = (EXTRACT(EPOCH FROM NOW())::BIGINT + (1000000 + RANDOM()::BIGINT % 1000000)) WHERE eth_address = '${address}';`;
-    const resetNonceResult = await conn.query(resetNonceQuery);
+    const resetNonceResult = await postgres.query(resetNonceQuery);
     if (resetNonceResult.rowCount !== 1) throw "Updating the nonce was not successful";
 
     return verificationResult;

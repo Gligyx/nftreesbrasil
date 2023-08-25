@@ -1,5 +1,5 @@
 import { projectConfig } from "@/config";
-import { Signer, ethers  } from "ethers";
+import { Signer, ethers  } from "ethers-new";
 
 interface Window {
   ethereum?: any;

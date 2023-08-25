@@ -18,7 +18,7 @@ export default async function ProjectsPage() {
     <>
       <h1>Active Projects</h1>
       <ul>
-        {list.map((project) => <li>{project}</li>)}
+        {list.map((project, index) => <li key={index}>{project}</li>)}
       </ul>
     </>
   )

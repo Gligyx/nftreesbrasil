@@ -60,6 +60,25 @@ interface CommentUploadObjReady {
   evaluatorAddress: EthAddress
 }
 
+// AcceptedActionPlan data upload
+interface AcceptedActionPlanUploadObj {
+  projectId: ProjectId,
+  actionPlanId: ActionPlanId,
+  actionPlanCID: string,
+  acceptedBy: EthAddress,  // evaluator_address
+  actionPlanSigner: EthAddress,
+  timestamp: number | null,
+}
+interface AcceptedActionPlanUploadObjReady {
+  acceptedApName: string,
+  projectId: ProjectId,
+  actionPlanId: ActionPlanId,
+  actionPlanCID: string,
+  acceptedBy: EthAddress,  // evaluator_address
+  actionPlanSigner: EthAddress,
+  timestamp: number | null,
+}
+
 type ToastId = React.MutableRefObject<string | number | null>;
 
 interface InitProjectObject {
@@ -76,6 +95,7 @@ interface InitProjectObject {
 type ProjectId = string;                  // 20 character long string, example: Project-0123456789ab
 type ActionPlanId = string;               // 23 character long string, example: ActionPlan-0123456789ab
 type CommentId = string;                  // 20 character long string, example: Comment-0123456789ab
+type AcceptedActionPlanId = string;       // 23 character long string, same as ActionPlanId (maps to ActionPlan), example AcceptedAP-0123456789ab
 
 
 // Object for hashing
@@ -105,8 +125,15 @@ interface SignableComment {
   action_plan_id: ActionPlanId,
   action_plan_cid: string,
   comment: string,
-  comment_obj: DataObjCid,
+  comment_obj: DataObjCid | null,
   evaluator_address: EthAddress
+}
+interface SignableAcceptedActionPlan {
+  project_id: ProjectId,
+  action_plan_id: ActionPlanId,
+  action_plan_cid: string,
+  accepted_by: EthAddress,   // evaluator_address
+  timestamp: number
 }
 
 // Asset objects (ready to be deployed to CO2)
@@ -127,6 +154,14 @@ interface CommentOnActionPlan {
   action_plan_cid: string,
   comment: string,
   comment_id: CommentId,
+  evaluator_signature: Signature
+}
+interface AcceptedActionPlan {
+  project_id: ProjectId,
+  action_plan_id: ActionPlanId,
+  action_plan_cid: string,
+  accepted_by: EthAddress,
+  timestamp: number,
   evaluator_signature: Signature
 }
 

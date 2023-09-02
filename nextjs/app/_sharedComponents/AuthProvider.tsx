@@ -37,6 +37,7 @@ export default function AuthProvider({ children } : ChildrenProps) {
     const rawResponse = await fetch(url, { 
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },

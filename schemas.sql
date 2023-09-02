@@ -27,7 +27,9 @@ CREATE TABLE projects (
     project_id VARCHAR(20) PRIMARY KEY,
     project_name TEXT NOT NULL,
     accepted_action_plan VARCHAR(23),
-    hypercert_created boolean,
+    hypercert VARCHAR(43),
+    price_per_one INT,
+    sell_limit INT,
     finished_id VARCHAR(22),
     signed_finished_id VARCHAR(21),
     project_owner VARCHAR(42) NOT NULL

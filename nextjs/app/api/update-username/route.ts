@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     
     const address: EthAddress = requestObject.address.toLocaleLowerCase();
     const newUsername: Username = requestObject.new_username;
-    const token: jwtToken = requestObject.jwt_token;
+    const token = request.headers.get('authorization')?.split(" ")[1] as jwtToken;
     
     // Authenticate user 
     if (!jwtAuth(token, address)) throw "Error during JWT authentication!";

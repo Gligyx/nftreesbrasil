@@ -8,6 +8,7 @@ import { createAcceptedAPSignatureMessage, createActionPlanSignatureMessage } fr
 import { projectConfig } from "@/config";
 import { HypercertClient, formatHypercertData, TransferRestrictions } from '@hypercerts-org/sdk';
 import { ethers, BigNumberish } from 'ethers';    // old ethers (v5)
+import { ethers as ethers_new, Signer } from 'ethers-new';
 
 
 export async function GET(request: NextRequest) {
@@ -156,7 +157,7 @@ async function createAsset(
 ) {
   try {
     if (!postgres) throw "Could not connect to database.";
-    const checkCo2ExistsQuery = `SELECT * FROM projects WHERE project_id = '${asset.project_id}'`;
+    const checkCo2ExistsQuery = `SELECT * FROM projects WHERE project_id = '${asset.project_id}';`;
     const checkCo2ExistsResult = await postgres.query(checkCo2ExistsQuery);
     if (checkCo2ExistsResult.rowCount !== 1) throw "Error querying database!";
     if (checkCo2ExistsResult.rows[0].accepted_action_plan) {
@@ -199,7 +200,8 @@ async function createAsset(
 
           // Update database
           if (!postgres) throw "Could not connect to PostgreSQL database!";
-          const insertActionPlanQuery = `UPDATE projects (accepted_action_plan) VALUES (${asset.action_plan_id}) WHERE project_id = '${asset.project_id}'`;
+          const insertActionPlanQuery = `UPDATE projects SET accepted_action_plan = '${asset.action_plan_id}' WHERE project_id = '${asset.project_id}';`;
+          console.log("Query: ", insertActionPlanQuery)
           const insertActionPlanResult = await postgres.query(insertActionPlanQuery);
           if (insertActionPlanResult.rowCount !== 1) throw "Error saving new entry to database.";
 
@@ -226,10 +228,10 @@ async function createAsset(
 async function createHypercert(writer: WritableStreamDefaultWriter<any>, encoder: TextEncoder, asset: AcceptedActionPlan, projectOwner: EthAddress) {
   try {
     if (!postgres) throw "Could not connect to database.";
-    const hypercertExistsQuery = `SELECT * FROM projects WHERE project_id = '${asset.project_id}'`;
+    const hypercertExistsQuery = `SELECT * FROM projects WHERE project_id = '${asset.project_id}';`;
     const hypercertExistsResult = await postgres.query(hypercertExistsQuery);
     if (hypercertExistsResult.rowCount !== 1) throw "Error querying PostgreSQL database";
-    if (hypercertExistsResult.rows[0].hypercert_created) {
+    if (hypercertExistsResult.rows[0].hypercert) {
       console.warn("Hypercert already exists!");
       writer.write(encoder.encode("data: " + JSON.stringify({ hypercertExists: true, }) + "\n\n"));        // Hypercert Exists Signal
       writer.close();
@@ -255,7 +257,7 @@ async function createHypercert(writer: WritableStreamDefaultWriter<any>, encoder
       chainId: process.env.NETWORK === "goerli" ? 5 : 100,
       operator: wallet,
       nftStorageToken,
-      web3StorageToken
+      web3StorageToken,
     });
 
     // Validate and format Hypercert metadata
@@ -285,11 +287,11 @@ async function createHypercert(writer: WritableStreamDefaultWriter<any>, encoder
     if (!metadata) throw "Metadata is null"
     
     // Set the total amount of units available
-    const totalUnits: BigNumberish = 777
+    const totalUnits: BigNumberish = 10000
     
     
     // Define the transfer restriction
-    const transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly
+    const transferRestrictions: TransferRestrictions = TransferRestrictions.AllowAll;
     
 
     // Mint your Hypercert!
@@ -297,20 +299,39 @@ async function createHypercert(writer: WritableStreamDefaultWriter<any>, encoder
       metadata,
       totalUnits,
       transferRestrictions,
+      { gasLimit: 500000}
     );
-    
-    const claimsBefore = await client.indexer.fractionsByOwner(address);
-    const origClaimCount = claimsBefore.claimTokens.length;
-    let currentClaimCount = origClaimCount;
+    const receipt = await tx.wait();
 
-    do {
-      const claimsCurrent = await client.indexer.fractionsByOwner(address);
-      currentClaimCount = claimsCurrent.claimTokens.length;
-      await sleep(5000);
-    } while (origClaimCount === currentClaimCount)
+    const claims = await client.indexer.fractionsByOwner(address);
+    console.log("claims: ", claims);
+    const lastClaim = claims.claimTokens[claims.claimTokens.length-1];
+    console.log("lastClaim: ", lastClaim);
+    const tokenID = lastClaim.tokenID;
+    console.log("tokenID: ", tokenID);
+    const data = ethers.utils.formatBytes32String(asset.project_id);
+
+
+    console.log("projectConfig.marketContract: ", projectConfig.marketContract)
+    const id: BigNumberish = tokenID;
+    const transferTx = await client.contract.safeTransferFrom(address, projectConfig.marketContract, id, totalUnits, data, { gasLimit: 500000 });
+    //console.log("transfer TX: ", transferTx)
+    const transferResponse = await tx.wait()
+    console.log("transaction hash: ", transferResponse.transactionHash)
+
+    
+    const marketClaims = await client.indexer.fractionsByOwner(projectConfig.marketContract);
+    console.log("Market claims: ", marketClaims);
+    const marketLastClaim = marketClaims.claimTokens[claims.claimTokens.length-1];
+    console.log("Market lastClaim: ", marketLastClaim);
+    const marketTokenID = marketLastClaim.tokenID;
+    console.log("Market tokenID: ", marketTokenID);
+
+    
+    
 
     if (!postgres) throw "Could not connect to database!";
-    const insertHypercertQuery = `UPDATE projects (hypercert_created) VALUES (TRUE) WHERE project_id = '${asset.project_id}'`;
+    const insertHypercertQuery = `UPDATE projects SET hypercert = ${tokenID} WHERE project_id = '${asset.project_id}';`;
     const insertHypercertResult = await postgres.query(insertHypercertQuery);
     if (insertHypercertResult.rowCount !== 1) throw "Error writing value to database! (Hypercert creation)";
 
@@ -328,6 +349,11 @@ async function createHypercert(writer: WritableStreamDefaultWriter<any>, encoder
     console.error("There was an error, while trying to create the Hypercert: ", error);
     return -7;
   }
+}
+
+// Register the Hypercert in the MarketContract, that will handle the sellings
+async function registerHypercert() {
+  
 }
 
 async function waitForFile(folderPath: string, fileName: string) {

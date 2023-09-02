@@ -11,7 +11,7 @@ export async function DELETE(request: NextRequest) {
     const requestObject = await request.json();
     
     const address: EthAddress = requestObject.address.toLocaleLowerCase();
-    const token: jwtToken = requestObject.jwt_token;
+    const token = request.headers.get('authorization')?.split(" ")[1] as string;
 
     // Authenticate user 
     if (!jwtAuth(token, address)) throw "Error during JWT authentication!";

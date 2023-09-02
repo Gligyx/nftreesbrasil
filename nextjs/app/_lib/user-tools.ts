@@ -44,10 +44,13 @@ export async function setNewUsername(address: EthAddress, username: Username, jw
     const url = `${projectConfig.serverAddress}/api/update-username`;
     const result = await fetch(url, { 
       method: 'POST', 
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ 
         address: address,
-        new_username: username,
-        jwt_token: jwtToken
+        new_username: username
       })
     });
     const jsonResult = await result.json();
@@ -66,9 +69,12 @@ export async function deleteUserFromDatabase(address: EthAddress, jwtToken: jwtT
     const url = `${projectConfig.serverAddress}/api/delete-user`;
     const result = await fetch(url, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         address: address,
-        jwt_token: jwtToken
       })
     });
     const jsonResult = await result.json();

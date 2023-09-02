@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     if (request.method !== 'POST') throw "Method not allowed";
     const requestObject = await request.json();
-    const jwtToken = requestObject.token;
+    const jwtToken = request.headers.get('authorization')?.split(" ")[1] as jwtToken;
     const address_from_frontend = requestObject.address.toLocaleLowerCase();
 
     // Verify the JWT token
